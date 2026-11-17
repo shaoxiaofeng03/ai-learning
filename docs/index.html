@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4f46e5">
+<title>W1 学习手册 · Java 后端转 AI</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --fg:#17181c; --muted:#6b7280; --card:#ffffff;
+    --accent:#4f46e5; --border:#e4e6eb; --code-bg:#f2f3f5;
+    --warn:#b45309; --warn-bg:#fff7e6; --ok:#16a34a;
+  }
+  [data-theme="dark"] {
+    --bg:#101113; --fg:#e9eaec; --muted:#9aa1ab; --card:#191b1f;
+    --accent:#8b93ff; --border:#2a2d33; --code-bg:#212429;
+    --warn:#f0b45c; --warn-bg:#2e2513; --ok:#4ade80;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--fg);
+    font:16px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .topbar { position:sticky; top:0; z-index:30; background:var(--bg); }
+  header { background:var(--card); border-bottom:1px solid var(--border); padding:10px 16px 8px; }
+  .hrow { display:flex; align-items:center; gap:10px; }
+  h1 { font-size:17px; margin:0; flex:1; letter-spacing:.2px; }
+  .hsub { font-size:12.5px; color:var(--muted); margin:2px 0 0; }
+  .pbar { height:6px; background:var(--border); border-radius:999px; overflow:hidden; margin-top:8px; }
+  .pbar > div { height:100%; width:0; background:var(--accent); transition:width .25s ease; }
+  .pmeta { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:4px; }
+  #tabs {
+    display:flex; gap:6px; overflow-x:auto; padding:8px 16px;
+    background:var(--bg); border-bottom:1px solid var(--border); scrollbar-width:none;
+  }
+  #tabs::-webkit-scrollbar { display:none; }
+  #tabs button {
+    flex:0 0 auto; border:1px solid var(--border); background:var(--card);
+    color:var(--muted); padding:6px 12px; border-radius:999px; font-size:13.5px;
+    cursor:pointer; font-family:inherit;
+  }
+  #tabs button.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  #tabs button .dot { font-size:11px; opacity:.8; }
+  main { max-width:760px; margin:0 auto; padding:14px 16px 70px; }
+  .panel { display:none; }
+  .panel.show { display:block; animation:fade .18s ease; }
+  @keyframes fade { from { opacity:.4; transform:translateY(4px); } to { opacity:1; transform:none; } }
+  h2 { font-size:20px; margin:6px 0 4px; }
+  .goal { color:var(--muted); font-size:14px; margin:0 0 10px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin:12px 0; }
+  .card h3 { margin:0 0 8px; font-size:15px; }
+  .card ol, .card ul { margin:0; padding-left:20px; }
+  .card li { margin:4px 0; font-size:14.5px; }
+  table { width:100%; border-collapse:collapse; font-size:13.8px; }
+  th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  th { color:var(--muted); font-weight:600; }
+  code { background:var(--code-bg); padding:1px 5px; border-radius:4px; font-size:13.2px;
+         font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  pre { background:var(--code-bg); padding:12px; border-radius:8px; overflow-x:auto;
+        font-size:12.8px; line-height:1.55; margin:8px 0 0; }
+  pre code { background:none; padding:0; }
+  .warn { background:var(--warn-bg); border-left:3px solid var(--warn);
+          padding:8px 12px; border-radius:6px; font-size:13.8px; margin:6px 0 0; }
+  .task { display:flex; gap:10px; align-items:flex-start; padding:11px 2px;
+          border-bottom:1px dashed var(--border); cursor:pointer; font-size:14.5px; }
+  .task:last-child { border-bottom:0; }
+  .task input { width:20px; height:20px; margin:2px 0 0; accent-color:var(--accent); flex:0 0 auto; }
+  .task.done span { text-decoration:line-through; color:var(--muted); }
+  details.qa { background:var(--card); border:1px solid var(--border); border-radius:10px;
+               padding:10px 14px; margin:8px 0; }
+  details.qa summary { cursor:pointer; font-weight:600; font-size:14.3px; }
+  details.qa p { margin:8px 0 0; color:var(--muted); font-size:13.8px; }
+  .btn { border:1px solid var(--border); background:var(--card); color:var(--fg);
+         padding:8px 13px; border-radius:8px; font-size:13.5px; cursor:pointer; font-family:inherit; }
+  .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .fc { text-align:center; padding:6px 0; }
+  .fc .q { font-size:16px; font-weight:600; min-height:52px; display:flex; align-items:center; justify-content:center; }
+  .fc .a { margin-top:10px; color:var(--muted); font-size:14px; min-height:40px; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .muted { color:var(--muted); font-size:13.5px; }
+  #exportBox { width:100%; min-height:120px; margin-top:10px; font-size:13px;
+               font-family:ui-monospace, monospace; background:var(--code-bg);
+               color:var(--fg); border:1px solid var(--border); border-radius:8px; padding:10px; }
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:24px 16px 40px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <header>
+    <div class="hrow">
+      <div style="flex:1">
+        <h1>W1 · Java 后端 → AI</h1>
+        <p class="hsub">2026-11-16 ~ 11-22 · 每天 2 小时</p>
+      </div>
+      <button class="btn" id="themeBtn" aria-label="切换主题">🌙</button>
+    </div>
+    <div class="pbar"><div id="bar"></div></div>
+    <div class="pmeta"><span id="progressText">0 / 24</span><span id="pctText">0%</span></div>
+  </header>
+  <nav id="tabs">
+    <button data-tab="d1" class="active">D1</button>
+    <button data-tab="d2">D2</button>
+    <button data-tab="d3">D3</button>
+    <button data-tab="d4">D4</button>
+    <button data-tab="d5">D5</button>
+    <button data-tab="d6">D6</button>
+    <button data-tab="cheat">速查</button>
+    <button data-tab="help">说明</button>
+  </nav>
+</div>
+
+<main>
+
+<!-- ============ D1 ============ -->
+<section class="panel show" id="d1">
+  <h2>D1 · 读懂第一个服务</h2>
+  <p class="goal">目标：看懂 FastAPI 的最小结构，能自己加接口。</p>
+
+  <div class="card">
+    <h3>四个要点</h3>
+    <ol>
+      <li><code>FastAPI()</code> 是应用容器，<code>@app.get</code> 注册路由。</li>
+      <li><code>response_model</code> 决定响应结构和 OpenAPI 文档。</li>
+      <li>GET 参数用 <code>Query()</code> 校验，POST body 用 <code>BaseModel</code>。</li>
+      <li><code>include_in_schema=False</code> 让路由不出现在文档里。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Java 对照</h3>
+    <table>
+      <tr><th>FastAPI</th><th>Spring</th></tr>
+      <tr><td><code>FastAPI()</code></td><td><code>@SpringBootApplication</code></td></tr>
+      <tr><td><code>@app.get</code></td><td><code>@GetMapping</code></td></tr>
+      <tr><td><code>BaseModel</code></td><td>DTO + <code>@Valid</code></td></tr>
+      <tr><td><code>Query()</code></td><td><code>@RequestParam</code></td></tr>
+      <tr><td><code>APIRouter</code></td><td><code>@RestController</code> 分模块</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>易错点</h3>
+    <p class="warn"><code>/docs</code> 白屏 = <code>cdn.jsdelivr.net</code> 在国内打不开。换 bootcdn。</p>
+    <p class="warn" style="margin-top:6px">参数是长文本时用 POST，不要用 GET。</p>
+  </div>
+
+  <div class="card">
+    <h3>今日任务</h3>
+    <label class="task"><input type="checkbox" data-id="d1-1" data-day="d1"><span>跑通 <code>pytest</code> 与 <code>uvicorn</code>，打开 <code>/</code>、<code>/docs</code>、<code>/echo</code></span></label>
+    <label class="task"><input type="checkbox" data-id="d1-2" data-day="d1"><span>逐行读 <code>main.py</code>，做 Java 对照表</span></label>
+    <label class="task"><input type="checkbox" data-id="d1-3" data-day="d1"><span>加 <code>GET /add</code> 和 <code>GET /time</code></span></label>
+    <label class="task"><input type="checkbox" data-id="d1-4" data-day="d1"><span>两个接口各写一个 pytest 用例</span></label>
+  </div>
+
+  <details class="qa"><summary>自测：参数是一段 500 字文本，用 GET 还是 POST？</summary>
+    <p>POST。GET 参数放 URL，有长度限制，还会被日志和缓存记录。有无副作用决定动词，数据量决定能否用 GET。</p></details>
+</section>
+
+<!-- ============ D2 ============ -->
+<section class="panel" id="d2">
+  <h2>D2 · 类型系统与校验</h2>
+  <p class="goal">目标：把 Java 的 DTO + Bean Validation 搬到 pydantic。</p>
+
+  <div class="card">
+    <h3>六个要点</h3>
+    <ol>
+      <li><b>注解只说明，不校验。</b>Python 的类型标注运行时不检查。</li>
+      <li>真正拦截非法输入的是 <b>pydantic</b>，失败自动返回 422。</li>
+      <li><code>gt</code> 大于、<code>ge</code> 大于等于、<code>lt</code> 小于、<code>le</code> 小于等于。</li>
+      <li>嵌套模型<b>自动递归校验</b>，不用写 <code>@Valid</code>。</li>
+      <li>金额用 <code>Decimal</code>，不用 <code>float</code>。</li>
+      <li>派生字段（总额）服务端算，用 <code>@computed_field</code>。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>类型标注</h3>
+    <table>
+      <tr><th>Java</th><th>Python</th></tr>
+      <tr><td><code>String</code></td><td><code>str</code></td></tr>
+      <tr><td><code>List&lt;String&gt;</code></td><td><code>list[str]</code></td></tr>
+      <tr><td><code>Map&lt;String,Integer&gt;</code></td><td><code>dict[str, int]</code></td></tr>
+      <tr><td><code>Optional&lt;User&gt;</code></td><td><code>User | None</code></td></tr>
+      <tr><td><code>Set&lt;Long&gt;</code></td><td><code>set[int]</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>校验对照</h3>
+    <table>
+      <tr><th>Java</th><th>pydantic</th></tr>
+      <tr><td><code>@NotNull</code></td><td>非 Optional 且无默认值</td></tr>
+      <tr><td><code>@NotBlank</code></td><td><code>Field(min_length=1)</code></td></tr>
+      <tr><td><code>@Min/@Max</code></td><td><code>Field(ge=, le=)</code></td></tr>
+      <tr><td><code>@Size</code></td><td><code>Field(min_length=, max_length=)</code></td></tr>
+      <tr><td><code>@Pattern</code></td><td><code>Field(pattern=r"...")</code></td></tr>
+      <tr><td>自定义 Validator</td><td><code>@field_validator</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>骨架代码</h3>
+<pre><code>class OrderItem(BaseModel):
+    sku: str = Field(min_length=1, max_length=64)
+    qty: int = Field(ge=1, le=999)
+    price: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
+
+class Order(BaseModel):
+    id: str = Field(pattern=r"^ORD-\d{6}$")
+    items: list[OrderItem] = Field(min_length=1)
+
+    @computed_field
+    @property
+    def total(self) -&gt; Decimal:
+        return sum((i.qty * i.price for i in self.items), Decimal("0"))</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>易错点</h3>
+    <p class="warn"><code>Field(min_length=1)</code> 拦不住 <code>" "</code>（一个空格）。需要 <code>@field_validator</code> 做 strip 后再判断。</p>
+    <p class="warn" style="margin-top:6px">422 的字段路径在 <code>detail[0].loc</code>，嵌套时是 <code>["body","items",0,"qty"]</code>。</p>
+  </div>
+
+  <div class="card">
+    <h3>今日任务</h3>
+    <label class="task"><input type="checkbox" data-id="d2-1" data-day="d2"><span>类型标注对照：<code>list[str]</code> / <code>dict[str,int]</code> / <code>str|None</code></span></label>
+    <label class="task"><input type="checkbox" data-id="d2-2" data-day="d2"><span>定义 User / Order / OrderItem 三个模型</span></label>
+    <label class="task"><input type="checkbox" data-id="d2-3" data-day="d2"><span>加校验，并在 422 里确认 <code>loc</code> 路径</span></label>
+    <label class="task"><input type="checkbox" data-id="d2-4" data-day="d2"><span>写 5 个测试（含非法输入）</span></label>
+  </div>
+
+  <details class="qa"><summary>自测：<code>def f(x: int)</code> 传 <code>"abc"</code> 会怎样？</summary>
+    <p>什么都不发生，函数里照常拿到字符串。注解只是元数据，运行时不做检查。</p></details>
+  <details class="qa"><summary>自测：为什么金额用 Decimal 不用 float？</summary>
+    <p>float 是二进制浮点，0.1 + 0.2 ≠ 0.3，累计会出分位误差。Decimal 是十进制定点，适合金额。</p></details>
+  <details class="qa"><summary>自测：为什么 total 不让客户端传？</summary>
+    <p>客户端可以传 1 件付 0 元。金额必须服务端根据明细计算，客户端数据不可信。</p></details>
+</section>
+
+<!-- ============ D3 ============ -->
+<section class="panel" id="d3">
+  <h2>D3 · 列表推导与生成器</h2>
+  <p class="goal">目标：把 Java Stream 的思维翻译成 Python。</p>
+
+  <div class="card">
+    <h3>五个要点</h3>
+    <ol>
+      <li>列表推导 = <code>filter + map + collect</code>。</li>
+      <li>语法：<code>[f(x) for x in xs if cond]</code>。</li>
+      <li>生成器 <code>(f(x) for x in xs)</code> 是<b>惰性</b>的，不占内存。</li>
+      <li>生成器<b>只能遍历一次</b>，遍历完就空了。</li>
+      <li><code>yield</code> 用来写生成器函数，等价于返回 <code>Iterator</code>。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>对照</h3>
+    <table>
+      <tr><th>Java</th><th>Python</th></tr>
+      <tr><td><code>stream().filter(..).map(..).collect()</code></td><td><code>[f(x) for x in xs if cond]</code></td></tr>
+      <tr><td><code>Collectors.groupingBy</code></td><td><code>dict</code> 累加 / <code>itertools.groupby</code></td></tr>
+      <tr><td><code>Iterator</code> / 惰性 Stream</td><td>生成器</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>代码</h3>
+<pre><code>nums = [1, -2, 3, -4]
+print([x * 2 for x in nums if x &gt; 0])   # [2, 6]
+
+def read_lines(path: str):
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            yield line.strip()
+
+gen = (x * 2 for x in nums)
+print(list(gen))   # [2, -4, 6, -8]
+print(list(gen))   # []  第二次就空了</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>易错点</h3>
+    <p class="warn">生成器没有 <code>len()</code>，也不能用下标。需要长度就先 <code>list()</code>——但那就不省内存了。</p>
+  </div>
+
+  <div class="card">
+    <h3>今日任务</h3>
+    <label class="task"><input type="checkbox" data-id="d3-1" data-day="d3"><span>把一段 Java Stream 翻成列表推导</span></label>
+    <label class="task"><input type="checkbox" data-id="d3-2" data-day="d3"><span>写 dict / set 推导各一个</span></label>
+    <label class="task"><input type="checkbox" data-id="d3-3" data-day="d3"><span>用生成器读 10 万行日志，统计 level 分布</span></label>
+    <label class="task"><input type="checkbox" data-id="d3-4" data-day="d3"><span>记录列表版和生成器版的内存差异</span></label>
+  </div>
+
+  <details class="qa"><summary>自测：什么时候必须用生成器？</summary>
+    <p>数据量大于内存、只需要顺序处理一次、或者要边读边算（流式）时。比如读大文件、处理日志、分批调用 LLM。</p></details>
+</section>
+
+<!-- ============ D4 ============ -->
+<section class="panel" id="d4">
+  <h2>D4 · async / await 的本质</h2>
+  <p class="goal">目标：搞清 async 不是多线程，只加速 IO。</p>
+
+  <div class="card">
+    <h3>五个要点</h3>
+    <ol>
+      <li><code>async def</code> 定义协程，<code>await</code> 让出控制权。</li>
+      <li>单线程 + 事件循环 + 协作式调度，不是多线程。</li>
+      <li><b>只适合 IO 密集</b>，CPU 密集不会变快。</li>
+      <li><code>asyncio.gather</code> 并发等待多个协程。</li>
+      <li>同步函数里不能 <code>await</code>；阻塞调用会卡死整个事件循环。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>对照</h3>
+    <table>
+      <tr><th>Java</th><th>Python asyncio</th></tr>
+      <tr><td>线程池</td><td>事件循环（单线程）</td></tr>
+      <tr><td>OS 调度，微秒级切换</td><td>用户态调度，纳秒级</td></tr>
+      <tr><td><code>CompletableFuture.allOf</code></td><td><code>asyncio.gather</code></td></tr>
+      <tr><td>回调 / thenApply</td><td><code>await</code>，写法像同步</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>代码</h3>
+<pre><code>import asyncio, time
+
+async def work(i: int) -&gt; int:
+    await asyncio.sleep(1)
+    return i * i
+
+async def main() -&gt; None:
+    t = time.perf_counter()
+    results = await asyncio.gather(*(work(i) for i in range(10)))
+    print(results, round(time.perf_counter() - t, 2))  # ≈ 1.0s
+
+asyncio.run(main())</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>易错点</h3>
+    <p class="warn">在 async 函数里调用 <code>requests.get()</code> 会阻塞整个事件循环，所有协程一起卡住。要用 <code>httpx.AsyncClient</code>。</p>
+  </div>
+
+  <div class="card">
+    <h3>今日任务</h3>
+    <label class="task"><input type="checkbox" data-id="d4-1" data-day="d4"><span>写 <code>async work(i)</code>，串行跑 10 个并计时</span></label>
+    <label class="task"><input type="checkbox" data-id="d4-2" data-day="d4"><span>用 <code>asyncio.gather</code> 并发跑 10 个并计计时</span></label>
+    <label class="task"><input type="checkbox" data-id="d4-3" data-day="d4"><span>把 <code>/echo</code> 改成 <code>async def</code>，观察有无区别</span></label>
+    <label class="task"><input type="checkbox" data-id="d4-4" data-day="d4"><span>笔记：async 与线程池的三个区别</span></label>
+  </div>
+
+  <details class="qa"><summary>自测：async 能加速 CPU 密集任务吗？</summary>
+    <p>不能。单线程没有并行计算，循环还是循环。CPU 密集要用多进程（<code>ProcessPoolExecutor</code>）或换语言。</p></details>
+</section>
+
+<!-- ============ D5 ============ -->
+<section class="panel" id="d5">
+  <h2>D5 · 并发 HTTP</h2>
+  <p class="goal">目标：用 httpx + Semaphore 做可控的并发请求。</p>
+
+  <div class="card">
+    <h3>四个要点</h3>
+    <ol>
+      <li>异步用 <code>httpx.AsyncClient</code>，别用 <code>requests</code>。</li>
+      <li><code>Semaphore(n)</code> 限制同时进行的数量，对应 Java 的 <code>Semaphore</code>。</li>
+      <li>超时必设，否则一个慢请求拖垮整批。</li>
+      <li>一个 Client 复用连接，不要每次新建。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>代码</h3>
+<pre><code>import asyncio, httpx
+
+async def main() -&gt; None:
+    sem = asyncio.Semaphore(5)
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        async def one() -&gt; int:
+            async with sem:
+                r = await client.get("http://127.0.0.1:8000/health")
+                return r.status_code
+        codes = await asyncio.gather(*(one() for _ in range(20)))
+        print(codes.count(200))   # 20</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>易错点</h3>
+    <p class="warn">不加 Semaphore，20 个请求同时打出去。对方扛不住，或者触发限流，反而更慢。</p>
+    <p class="warn" style="margin-top:6px">忘记 <code>async with</code> 关连接，会泄漏连接池。</p>
+  </div>
+
+  <div class="card">
+    <h3>今日任务</h3>
+    <label class="task"><input type="checkbox" data-id="d5-1" data-day="d5"><span>并发请求自己的 <code>/health</code> 20 次</span></label>
+    <label class="task"><input type="checkbox" data-id="d5-2" data-day="d5"><span>加 <code>Semaphore(5)</code> 限流，对比总耗时</span></label>
+    <label class="task"><input type="checkbox" data-id="d5-3" data-day="d5"><span>加超时与简单重试（指数退避）</span></label>
+    <label class="task"><input type="checkbox" data-id="d5-4" data-day="d5"><span>笔记：对照 Java 线程池 + 信号量</span></label>
+  </div>
+
+  <details class="qa"><summary>自测：什么场景必须加 Semaphore？</summary>
+    <p>调第三方 API、调 LLM、写数据库时。对方通常有 QPS 限制，或者你的连接池有限。不加就会雪崩。</p></details>
+</section>
+
+<!-- ============ D6 ============ -->
+<section class="panel" id="d6">
+  <h2>D6 · 把前五天串起来</h2>
+  <p class="goal">目标：写一个小 CLI，同时用到类型标注、pydantic、生成器、asyncio。</p>
+
+  <div class="card">
+    <h3>题目</h3>
+    <p style="margin:0;font-size:14.5px">读一个本地文本文件，逐行处理，输出出现次数最多的 10 个词。</p>
+  </div>
+
+  <div class="card">
+    <h3>必须用到的四样东西</h3>
+    <ol>
+      <li><b>生成器</b>逐行读文件（不要一次 read 全部）</li>
+      <li><b>asyncio</b> 并发处理（每条加 <code>await asyncio.sleep(0)</code> 模拟 IO）</li>
+      <li><b>pydantic</b> 定义输出模型 <code>WordCount(word, count)</code></li>
+      <li>完整的<b>类型标注</b></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>验收标准</h3>
+    <ul>
+      <li><code>uv run python week01/day06_cli.py data.txt</code> 能跑</li>
+      <li>10 万行文件内存占用稳定（不随文件变大而暴涨）</li>
+      <li>代码 <code>ruff check</code> 无报错</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>今日任务</h3>
+    <label class="task"><input type="checkbox" data-id="d6-1" data-day="d6"><span>生成器逐行读文本</span></label>
+    <label class="task"><input type="checkbox" data-id="d6-2" data-day="d6"><span>并发处理并统计词频</span></label>
+    <label class="task"><input type="checkbox" data-id="d6-3" data-day="d6"><span>用 pydantic 模型输出 top 10</span></label>
+    <label class="task"><input type="checkbox" data-id="d6-4" data-day="d6"><span>跑通并写 100 字复盘</span></label>
+  </div>
+
+  <details class="qa"><summary>自测：为什么统计词频不该用 <code>asyncio.gather</code> 一次收所有行？</summary>
+    <p>10 万行全收进内存就失去生成器的意义了。应该分批（比如每 1000 行一批）并发处理，边处理边累加。</p></details>
+</section>
+
+<!-- ============ 速查 ============ -->
+<section class="panel" id="cheat">
+  <h2>速查表</h2>
+  <p class="goal">每天睡前刷一遍，比看十遍教程有用。</p>
+
+  <div class="card">
+    <h3>Java ↔ Python 总表</h3>
+    <table>
+      <tr><th>能力</th><th>Java</th><th>Python</th></tr>
+      <tr><td>包管理</td><td>Maven / Gradle</td><td>uv</td></tr>
+      <tr><td>测试</td><td>JUnit</td><td>pytest</td></tr>
+      <tr><td>格式检查</td><td>Checkstyle / SpotBugs</td><td>ruff</td></tr>
+      <tr><td>Web 框架</td><td>Spring MVC</td><td>FastAPI</td></tr>
+      <tr><td>DTO 校验</td><td><code>@Valid</code> + Hibernate Validator</td><td>pydantic</td></tr>
+      <tr><td>流式处理</td><td>Stream</td><td>列表推导 / 生成器</td></tr>
+      <tr><td>异步</td><td>CompletableFuture</td><td>async / await</td></tr>
+      <tr><td>并发限流</td><td>Semaphore</td><td>asyncio.Semaphore</td></tr>
+      <tr><td>HTTP 客户端</td><td>HttpClient / OkHttp</td><td>httpx</td></tr>
+      <tr><td>序列化</td><td>Jackson</td><td>pydantic / json</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>常用命令</h3>
+<pre><code>uv sync                                  # 装依赖
+uv run pytest -q                         # 跑测试
+uv run python -m uvicorn week01.app.main:app --reload
+ruff check .                             # 静态检查
+ruff format .                            # 格式化</code></pre>
+  </div>
+
+  <div class="card">
+    <h3>抽背卡片</h3>
+    <div class="fc">
+      <div class="q" id="fcQ">点下面按钮开始</div>
+      <div class="a" id="fcA" hidden></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn primary" id="fcNext">抽一张</button>
+        <button class="btn" id="fcShow" hidden>看答案</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>十条铁律</h3>
+    <ol>
+      <li>注解不校验，pydantic 才校验。</li>
+      <li>金额用 Decimal。</li>
+      <li>派生字段服务端算。</li>
+      <li>长文本用 POST。</li>
+      <li>生成器只能遍历一次。</li>
+      <li>async 只加速 IO。</li>
+      <li>阻塞调用会卡死事件循环。</li>
+      <li>并发必加 Semaphore。</li>
+      <li>超时必设。</li>
+      <li>一个 Client 复用连接。</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 说明 ============ -->
+<section class="panel" id="help">
+  <h2>怎么用、怎么改、怎么发布</h2>
+
+  <div class="card">
+    <h3>进度存在哪</h3>
+    <p class="muted" style="margin:0">存在你当前浏览器的 localStorage 里，换设备或清缓存会丢。点下面按钮导出，发给我，我就能看到你到哪了。</p>
+    <div class="row">
+      <button class="btn primary" id="exportBtn">导出进度</button>
+      <button class="btn" id="resetBtn">重置进度</button>
+    </div>
+    <textarea id="exportBox" hidden readonly></textarea>
+  </div>
+
+  <div class="card">
+    <h3>文档在哪</h3>
+<pre><code>ai-learning/docs/index.html   ← 整个页面就这一个文件
+ai-learning/week01/PLAN.md    ← 计划源头</code></pre>
+    <p class="muted" style="margin:8px 0 0">页面内容是从 PLAN.md 整理出来的。改了 PLAN，跟我说一声「同步到页面」。</p>
+  </div>
+
+  <div class="card">
+    <h3>怎么改</h3>
+    <ol>
+      <li>小改：直接跟我说「把 D3 那张表加一行」，我改文件。</li>
+      <li>自己改：用任意编辑器打开 <code>docs/index.html</code>，搜 <code>D3</code> 定位。</li>
+      <li>改完本地刷新浏览器就生效，不用重新构建。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>手机上怎么看</h3>
+    <ol>
+      <li><b>最快</b>：把 <code>index.html</code> 发到微信「文件传输助手」，手机点开，离线可看。</li>
+      <li><b>长期</b>：推 GitHub，开 Pages，手机浏览器收藏。</li>
+      <li><b>国内快</b>：Cloudflare Pages 或腾讯云静态托管。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>GitHub Pages 发布</h3>
+<pre><code>cd ai-learning
+git init
+git add .
+git commit -m "W1 study handbook"
+git branch -M main
+git remote add origin https://github.com/&lt;你的用户名&gt;/ai-learning.git
+git push -u origin main</code></pre>
+    <p class="muted" style="margin:8px 0 0">然后仓库 → Settings → Pages → Source 选 <b>Deploy from a branch</b> → 分支 <b>main</b>，目录选 <b>/docs</b> → Save。等 1 分钟，访问 <code>https://&lt;用户名&gt;.github.io/ai-learning/</code>。</p>
+  </div>
+</section>
+
+</main>
+
+<footer>W1 学习手册 · 生成于 2026-11-17 · 进度只存在本机</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- 主题 ----------
+  var themeBtn = document.getElementById("themeBtn");
+  var savedTheme = localStorage.getItem("w1-theme");
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  function syncThemeIcon() {
+    themeBtn.textContent = document.documentElement.dataset.theme === "dark" ? "☀️" : "🌙";
+  }
+  syncThemeIcon();
+  themeBtn.addEventListener("click", function () {
+    var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("w1-theme", next);
+    syncThemeIcon();
+  });
+
+  // ---------- 标签页 ----------
+  var tabs = Array.prototype.slice.call(document.querySelectorAll("#tabs button"));
+  var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
+  function activate(tab) {
+    tabs.forEach(function (b) { b.classList.toggle("active", b === tab); });
+    panels.forEach(function (p) { p.classList.toggle("show", p.id === tab.dataset.tab); });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  tabs.forEach(function (b) { b.addEventListener("click", function () { activate(b); }); });
+
+  // ---------- 进度 ----------
+  var KEY = "w1-progress-v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type="checkbox"][data-id]'));
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+
+  boxes.forEach(function (box) {
+    box.checked = !!state[box.dataset.id];
+    box.closest(".task").classList.toggle("done", box.checked);
+    box.addEventListener("change", function () {
+      state[box.dataset.id] = box.checked;
+      localStorage.setItem(KEY, JSON.stringify(state));
+      box.closest(".task").classList.toggle("done", box.checked);
+      updateProgress();
+    });
+  });
+
+  function updateProgress() {
+    var total = boxes.length;
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById("bar").style.width = pct + "%";
+    document.getElementById("progressText").textContent = done + " / " + total;
+    document.getElementById("pctText").textContent = pct + "%";
+    tabs.forEach(function (b) {
+      var day = b.dataset.tab;
+      if (day.charAt(0) !== "d") return;
+      var ds = boxes.filter(function (x) { return x.dataset.day === day; });
+      var dn = ds.filter(function (x) { return x.checked; }).length;
+      var label = day.toUpperCase();
+      b.textContent = label;
+      if (ds.length) {
+        var dot = document.createElement("span");
+        dot.className = "dot";
+        dot.textContent = " " + dn + "/" + ds.length;
+        b.appendChild(dot);
+      }
+    });
+  }
+  updateProgress();
+
+  // ---------- 导出 / 重置 ----------
+  document.getElementById("exportBtn").addEventListener("click", async function () {
+    var lines = ["W1 打卡进度（2026-11-16 ~ 11-22）"];
+    ["d1", "d2", "d3", "d4", "d5", "d6"].forEach(function (day) {
+      var ds = boxes.filter(function (x) { return x.dataset.day === day; });
+      var dn = ds.filter(function (x) { return x.checked; }).length;
+      lines.push(day.toUpperCase() + " " + dn + "/" + ds.length);
+    });
+    var text = lines.join("\n");
+    var ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (e) { ok = false; }
+    var box = document.getElementById("exportBox");
+    box.hidden = false;
+    box.value = ok ? text + "\n\n（已复制到剪贴板）" : text;
+    box.select();
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    if (!confirm("确定清空所有打卡记录？")) return;
+    state = {};
+    localStorage.removeItem(KEY);
+    boxes.forEach(function (b) {
+      b.checked = false;
+      b.closest(".task").classList.remove("done");
+    });
+    updateProgress();
+  });
+
+  // ---------- 抽背 ----------
+  var deck = [
+    ["注解不校验，谁来校验？", "pydantic。Python 类型注解只是元数据，运行时不做检查。"],
+    ["GET 和 POST 怎么选？", "查询用 GET，有无副作用 / 长文本 / 敏感数据用 POST。"],
+    ["@NotBlank 对应 pydantic 的什么？", "Field(min_length=1)，但拦不住纯空格，要配 field_validator。"],
+    ["gt 和 ge 的区别？", "gt 是大于，ge 是大于等于。金额用 gt=0。"],
+    ["嵌套模型需要额外注解吗？", "不需要。字段类型写成另一个 BaseModel 就自动递归校验。"],
+    ["为什么金额用 Decimal？", "float 有二进制精度误差，Decimal 是十进制定点。"],
+    ["total 为什么不让客户端传？", "客户端可伪造金额。必须服务端根据明细算。"],
+    ["列表推导等价于 Java 什么？", "stream().filter().map().collect()。"],
+    ["生成器能遍历几次？", "一次。遍历完就空了，也没有 len()。"],
+    ["async 能加速 CPU 密集任务吗？", "不能。单线程没有并行计算，只有 IO 等待时才有效。"],
+    ["async 函数里能用 requests 吗？", "不能。会阻塞整个事件循环，要用 httpx.AsyncClient。"],
+    ["Semaphore 的作用？", "限制同时进行的数量，防止打爆对方或耗尽连接池。"],
+    ["一个 Client 能反复用吗？", "能，而且应该复用连接。不要每次请求都新建 Client。"],
+    ["422 的字段路径在哪？", "detail[0].loc，嵌套时形如 [\"body\",\"items\",0,\"qty\"]。"],
+    ["派生字段怎么算？", "服务端用 @computed_field + @property。"],
+    ["生成器读大文件怎么用？", "yield 逐行返回，边读边处理，不把整个文件读进内存。"]
+  ];
+  var current = -1;
+  var fcQ = document.getElementById("fcQ");
+  var fcA = document.getElementById("fcA");
+  var fcShow = document.getElementById("fcShow");
+
+  function nextCard() {
+    var i = Math.floor(Math.random() * deck.length);
+    if (deck.length > 1 && i === current) i = (i + 1) % deck.length;
+    current = i;
+    fcQ.textContent = deck[i][0];
+    fcA.textContent = deck[i][1];
+    fcA.hidden = true;
+    fcShow.hidden = false;
+  }
+  document.getElementById("fcNext").addEventListener("click", nextCard);
+  fcShow.addEventListener("click", function () {
+    fcA.hidden = false;
+    fcShow.hidden = true;
+  });
+})();
+</script>
+</body>
+</html>

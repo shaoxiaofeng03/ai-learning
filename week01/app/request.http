@@ -1,0 +1,21 @@
+### 健康检查
+GET http://127.0.0.1:8000/health
+
+### get
+GET http://127.0.0.1:8000/echo?text=回显示的文本哈哈哈
+
+### get
+GET http://127.0.0.1:8000/add?a=2&b=3
+
+
+### get
+GET http://127.0.0.1:8000/now
+
+### post
+POST http://127.0.0.1:8000/echo_model
+Content-Type: application/json
+
+{
+  "text": "回显示的文本哈哈哈",
+  "remark": "备注信息8888"
+}
