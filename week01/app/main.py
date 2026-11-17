@@ -15,11 +15,11 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-from .copy1 import router as copy1_router
+from .day01 import router as day01_router
 
 # docs_url=None：关掉默认文档页，因为它的 JS 走 cdn.jsdelivr.net，国内打不开会白屏
 app = FastAPI(title="AI Learning - Week 01", docs_url=None, redoc_url=None)
-app.include_router(copy1_router)
+app.include_router(day01_router)
 
 # 换成国内 CDN，/docs 才能正常加载
 SWAGGER_VERSION = "5.17.14"

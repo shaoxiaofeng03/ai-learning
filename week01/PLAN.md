@@ -7,20 +7,20 @@
 
 - [x] 20min 跑一遍：`uv run pytest -q` → 全绿；`uvicorn` 起来，浏览器开 `/`、`/docs`、`/echo?text=你好`
 - [x] 40min 逐行读 `week01/app/main.py`，写 Java 对照表
-- [x] 45min 自己加两个接口（不许抄）：`GET /add?a=&b=` 返回和；`GET /time` 返回当前时间
-- [ ] 15min 各写一个 pytest 用例
+- [x] 45min 自己加两个接口（不许抄）：`GET /add?a=&b=` 返回和；`GET /now` 返回当前时间
+- [x] 15min 各写一个 pytest 用例
 
-交付：`/add`、`/time` 可调，测试全绿。
+交付：`/add`、`/now` 可调，测试全绿。
 自测：如果参数是一段 500 字文本，用 GET 还是 POST？为什么？
 
 ## Day 2 · 周二 11/17 · 类型系统与校验
 
-- [ ] 30min 类型标注：`list[str]` ≈ `List<String>`，`dict[str, int]` ≈ `Map<String,Integer>`，`str | None` ≈ `Optional<String>`
-- [ ] 50min pydantic：定义 `User` / `Order` / `OrderItem`，加校验（age 1-120、qty ≥ 1、price > 0、email 用 `Field(pattern=...)`，**不要加 email-validator 依赖**）
-- [ ] 30min 写 5 个测试，证明非法输入返回 422
-- [ ] 10min 笔记
+- [x] 30min 类型标注：`list[str]` ≈ `List<String>`，`dict[str, int]` ≈ `Map<String,Integer>`，`str | None` ≈ `Optional<String>`
+- [x] 50min pydantic：定义 `User` / `Order` / `OrderItem`，加校验（age 1-120、qty ≥ 1、price > 0、email 用 `Field(pattern=...)`，**不要加 email-validator 依赖**）
+- [x] 30min 写 5 个测试，证明非法输入返回 422
+- [x] 10min 笔记
 
-交付：`week01/day02_models.py` + 5 个测试。
+交付：`week01/app/day02.py` + 5 个测试（实际写了 9 个）。
 自测：Python 的类型注解运行时会检查吗？那 pydantic 为什么能拦下非法输入？
 
 ## Day 3 · 周三 11/18 · 列表推导与生成器
@@ -31,7 +31,7 @@
 - [ ] 40min 练习：把你写过的一段 Java Stream 翻成 Python；用生成器读 10 万行日志统计 level 分布，观察内存
 - [ ] 10min 笔记
 
-交付：`week01/day03_streams.py`。
+交付：`week01/app/day03.py`。
 自测：什么时候必须用生成器而不是列表？
 
 ## Day 4 · 周四 11/19 · async / await 的本质

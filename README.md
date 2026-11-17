@@ -52,14 +52,18 @@ uv run python -m uvicorn week01.app.main:app --reload
 uv run pytest -q
 ```
 
-## 用 Claude Code 的正确姿势
+## 用 AI 助手的正确姿势（Claude Code / DeepSeek Harness 通用）
 
-1. 在这个目录启动 Claude Code，它会自动读根目录的 `claude.md`。
+两个工具都读根目录的 `claude.md`，规则只维护这一份。
+
+1. 在这个目录启动助手，它会自动读 `claude.md`。
 2. 每周开始：让它读 `ROADMAP.md` 当前周，拆成 7 天任务。
 3. 写代码时：自己先写，卡住只问「这个报错怎么理解」，不要让它代写。
 4. 写完：`让它 review 这个文件`，要求给出问题 + 改法 + 一个追问。
 5. 周日：`出 5 道本周自测题，我答完你批改`。
 6. 每两周：把 10 个目标 JD 丢给它做差距分析，更新下周计划。
+
+> DSH 额外能做的：周日自测定时提醒、多个面试官 agent 并行 mock、直接产 `.docx` 简历 / `.pptx` 讲稿、worktree 隔离开实验代码。
 
 ## 项目记录要求（面试素材）
 
