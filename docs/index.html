@@ -36,10 +36,10 @@
     background:var(--bg); border-bottom:1px solid var(--border); scrollbar-width:none;
   }
   #tabs::-webkit-scrollbar { display:none; }
-  #tabs button {
+  #tabs button, #tabs a {
     flex:0 0 auto; border:1px solid var(--border); background:var(--card);
     color:var(--muted); padding:6px 12px; border-radius:999px; font-size:13.5px;
-    cursor:pointer; font-family:inherit;
+    cursor:pointer; font-family:inherit; text-decoration:none; line-height:1.4;
   }
   #tabs button.active { background:var(--accent); border-color:var(--accent); color:#fff; }
   #tabs button .dot { font-size:11px; opacity:.8; }
@@ -109,6 +109,7 @@
     <button data-tab="d5">D5</button>
     <button data-tab="d6">D6</button>
     <button data-tab="cheat">速查</button>
+    <a href="knowledge.html" style="color:var(--accent);border-color:var(--accent)">知识点 ›</a>
     <button data-tab="help">说明</button>
   </nav>
 </div>

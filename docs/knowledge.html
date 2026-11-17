@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>W1 知识点手册 · 阅读与记忆</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --fg:#17181c; --muted:#6b7280; --card:#ffffff;
+    --accent:#0f766e; --border:#e4e6eb; --code-bg:#f2f3f5;
+    --warn:#b45309; --warn-bg:#fff7e6; --mark:#fef3c7;
+  }
+  [data-theme="dark"] {
+    --bg:#101113; --fg:#e9eaec; --muted:#9aa1ab; --card:#191b1f;
+    --accent:#2dd4bf; --border:#2a2d33; --code-bg:#212429;
+    --warn:#f0b45c; --warn-bg:#2e2513; --mark:#3a2f10;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--fg);
+    font:16px/1.75 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  .topbar { position:sticky; top:0; z-index:30; background:var(--bg); }
+  header { background:var(--card); border-bottom:1px solid var(--border); padding:10px 16px 8px; }
+  .hrow { display:flex; align-items:center; gap:10px; }
+  h1 { font-size:17px; margin:0; flex:1; }
+  .hsub { font-size:12.5px; color:var(--muted); margin:2px 0 0; }
+  .pbar { height:6px; background:var(--border); border-radius:999px; overflow:hidden; margin-top:8px; }
+  .pbar > div { height:100%; width:0; background:var(--accent); transition:width .25s; }
+  .pmeta { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:4px; }
+  #jump { display:flex; gap:6px; overflow-x:auto; padding:8px 16px;
+          border-bottom:1px solid var(--border); scrollbar-width:none; }
+  #jump::-webkit-scrollbar { display:none; }
+  #jump a { flex:0 0 auto; text-decoration:none; color:var(--muted); background:var(--card);
+            border:1px solid var(--border); padding:6px 12px; border-radius:999px; font-size:13px; }
+  #jump a.done { color:#fff; background:var(--accent); border-color:var(--accent); }
+  main { max-width:740px; margin:0 auto; padding:14px 16px 70px; }
+  h2 { font-size:19px; margin:30px 0 6px; scroll-margin-top:110px; }
+  h2 .num { color:var(--accent); font-size:14px; margin-right:6px; }
+  .lead { color:var(--muted); font-size:13.5px; margin:0 0 8px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin:12px 0; }
+  .card h3 { margin:0 0 8px; font-size:15px; }
+  .core { background:var(--mark); border-radius:8px; padding:10px 12px; font-weight:600; font-size:14.5px; }
+  ol, ul { margin:8px 0 0; padding-left:20px; }
+  li { margin:5px 0; font-size:14.5px; }
+  table { width:100%; border-collapse:collapse; font-size:13.8px; margin-top:6px; }
+  th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  th { color:var(--muted); font-weight:600; }
+  code { background:var(--code-bg); padding:1px 5px; border-radius:4px; font-size:13.2px;
+         font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  pre { background:var(--code-bg); padding:12px; border-radius:8px; overflow-x:auto;
+        font-size:12.8px; line-height:1.55; margin:8px 0 0; }
+  pre code { background:none; padding:0; }
+  .warn { background:var(--warn-bg); border-left:3px solid var(--warn);
+          padding:8px 12px; border-radius:6px; font-size:13.8px; margin:8px 0 0; }
+  details.qa { background:var(--card); border:1px solid var(--border); border-radius:10px;
+               padding:10px 14px; margin:8px 0; }
+  details.qa summary { cursor:pointer; font-weight:600; font-size:14.3px; }
+  details.qa p { margin:8px 0 0; color:var(--muted); font-size:13.8px; }
+  .mastered { display:flex; align-items:center; gap:8px; margin-top:12px; padding-top:10px;
+              border-top:1px dashed var(--border); font-size:13.5px; color:var(--muted); cursor:pointer; }
+  .mastered input { width:18px; height:18px; accent-color:var(--accent); }
+  .btn { border:1px solid var(--border); background:var(--card); color:var(--fg);
+         padding:8px 13px; border-radius:8px; font-size:13.5px; cursor:pointer; font-family:inherit; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+  .back { display:inline-block; margin-top:8px; color:var(--accent); text-decoration:none; font-size:13.5px; }
+  .mnemonic { margin-top:8px; font-size:14px; }
+  .mnemonic b { color:var(--accent); }
+  footer { text-align:center; color:var(--muted); font-size:12px; padding:24px 16px 40px; }
+  @media print {
+    .topbar, .mastered, .row, .back { display:none !important; }
+    body { background:#fff; color:#000; }
+    .card { break-inside:avoid; border-color:#ddd; }
+    details.qa { break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <header>
+    <div class="hrow">
+      <div style="flex:1">
+        <h1>W1 知识点手册</h1>
+        <p class="hsub">6 个知识块 · 阅读 + 记忆 · 2026-11-16 ~ 11-22</p>
+      </div>
+      <button class="btn" id="themeBtn" aria-label="切换主题">🌙</button>
+    </div>
+    <div class="pbar"><div id="bar"></div></div>
+    <div class="pmeta"><span id="progressText">0 / 6 已掌握</span><span id="pctText">0%</span></div>
+  </header>
+  <nav id="jump">
+    <a href="#k1">K1 请求</a>
+    <a href="#k2">K2 校验</a>
+    <a href="#k3">K3 迭代</a>
+    <a href="#k4">K4 并发</a>
+    <a href="#k5">K5 HTTP</a>
+    <a href="#k6">K6 工程</a>
+    <a href="#must">必背</a>
+    <a href="#quiz">抽背</a>
+  </nav>
+</div>
+
+<main>
+
+  <div class="row">
+    <button class="btn" id="expandBtn">展开全部答案</button>
+    <a class="btn" href="index.html" style="text-decoration:none">← 回打卡手册</a>
+  </div>
+
+  <div class="card">
+    <h3>怎么用这份文档</h3>
+    <ol>
+      <li>周一到周六，每晚睡前读一个 K，10 分钟。</li>
+      <li>读完合上，用「抽背」自测，答不出的回去再读。</li>
+      <li>连续两次答对，勾「已掌握」。</li>
+      <li>周日整本过一遍，只看「必背 20 条」。</li>
+    </ol>
+  </div>
+
+  <h2 id="k0"><span class="num">全景</span>一个请求的完整路径</h2>
+  <div class="card">
+<pre><code>浏览器
+  │  GET /echo?text=hi  或  POST /echo {"text":"hi"}
+  ▼
+路由匹配        @app.get / @app.post
+  ▼
+参数校验        Query() / BaseModel  ──失败──▶ 422
+  ▼
+处理函数        你的业务代码
+  ▼
+响应序列化      response_model
+  ▼
+JSON 返回</code></pre>
+    <p class="mnemonic"><b>记法：</b>路由 → 校验 → 业务 → 序列化。中间任何一步失败，都在校验层返回 422。</p>
+  </div>
+
+  <!-- ================= K1 ================= -->
+  <h2 id="k1"><span class="num">K1</span>Web 框架与路由</h2>
+  <p class="lead">对应 Java：Spring MVC</p>
+
+  <div class="card">
+    <div class="core">一句话：装饰器在导入时把函数注册进路由表，请求来了按「方法 + 路径」匹配。</div>
+    <ol>
+      <li><code>FastAPI()</code> 是应用对象，内部持有路由表，等价 <code>@SpringBootApplication</code>。</li>
+      <li><code>@app.get("/echo")</code> 在<b>模块导入时</b>执行注册，不是每次请求都注册。</li>
+      <li><code>response_model</code> 做三件事：过滤多余字段、生成 OpenAPI 文档、决定返回结构。</li>
+      <li><code>APIRouter</code> 把路由拆到不同文件，等价 <code>@RestController</code> 分模块。</li>
+      <li>HTTP 方法决定语义：GET 查询、POST 提交、PUT 全量更新、PATCH 局部更新、DELETE 删除。</li>
+    </ol>
+    <table>
+      <tr><th>FastAPI</th><th>Spring</th></tr>
+      <tr><td><code>@app.get</code></td><td><code>@GetMapping</code></td></tr>
+      <tr><td><code>Query()</code></td><td><code>@RequestParam</code></td></tr>
+      <tr><td><code>BaseModel</code> 作入参</td><td><code>@RequestBody</code> + <code>@Valid</code></td></tr>
+      <tr><td><code>APIRouter</code></td><td><code>@RestController</code></td></tr>
+    </table>
+    <div class="warn">校验失败返回 <b>422</b>（Unprocessable Entity），不是 400。400 一般留给「请求格式本身坏了」。</div>
+    <p class="mnemonic"><b>口诀：</b>入参看位置（URL 还是 body），出参看模型。</p>
+    <label class="mastered"><input type="checkbox" data-k="k1"> 已掌握</label>
+  </div>
+
+  <details class="qa"><summary>自测：<code>response_model</code> 和函数返回类型注解，作用一样吗？</summary>
+    <p>不完全一样。返回类型注解用于类型提示和文档推断；<code>response_model</code> 额外做字段过滤和序列化控制。两者都写时以 <code>response_model</code> 为准。</p></details>
+
+  <!-- ================= K2 ================= -->
+  <h2 id="k2"><span class="num">K2</span>类型系统与校验</h2>
+  <p class="lead">对应 Java：DTO + Bean Validation</p>
+
+  <div class="card">
+    <div class="core">一句话：注解只是说明书，pydantic 才是门卫。</div>
+    <ol>
+      <li>Python 的类型注解<b>运行时完全不检查</b>，只是给 IDE、ruff、pydantic 看的元数据。</li>
+      <li>pydantic 在构造模型时校验，失败抛 <code>ValidationError</code>，FastAPI 转成 422。</li>
+      <li>字段类型写成另一个 <code>BaseModel</code>，<b>自动递归校验</b>，不需要 <code>@Valid</code>。</li>
+      <li>金额用 <code>Decimal</code>，不用 <code>float</code>（二进制浮点有精度误差）。</li>
+      <li>派生字段（总额、均价）必须<b>服务端算</b>，用 <code>@computed_field</code>。</li>
+      <li>自定义规则用 <code>@field_validator</code>，对应 Java 的自定义 <code>ConstraintValidator</code>。</li>
+    </ol>
+    <table>
+      <tr><th>Java</th><th>pydantic v2</th></tr>
+      <tr><td><code>@NotNull</code></td><td>非 Optional 且无默认值</td></tr>
+      <tr><td><code>@NotBlank</code></td><td><code>Field(min_length=1)</code> + validator 去空格</td></tr>
+      <tr><td><code>@Min/@Max</code></td><td><code>Field(ge=, le=)</code></td></tr>
+      <tr><td><code>@Size</code></td><td><code>Field(min_length=, max_length=)</code></td></tr>
+      <tr><td><code>@Pattern</code></td><td><code>Field(pattern=r"...")</code></td></tr>
+    </table>
+    <div class="warn"><code>min_length=1</code> 拦不住 <code>" "</code>。空格字符串长度是 1，必须 <code>strip()</code> 后再判断。</div>
+    <p class="mnemonic"><b>口诀：</b>gt/ge/lt/le = 大于/大于等于/小于/小于等于。金额 gt，数量 ge。</p>
+    <label class="mastered"><input type="checkbox" data-k="k2"> 已掌握</label>
+  </div>
+
+  <div class="card">
+    <h3>422 长什么样</h3>
+<pre><code>{
+  "detail": [{
+    "type": "greater_than_equal",
+    "loc": ["body", "items", 0, "qty"],
+    "msg": "Input should be greater than or equal to 1",
+    "input": 0
+  }]
+}</code></pre>
+    <p class="mnemonic"><b>记法：</b><code>loc</code> 是字段路径，<code>body</code> 之后依次是模型字段、数组下标。对应 Java 的 <code>BindingResult</code>。</p>
+  </div>
+
+  <details class="qa"><summary>自测：嵌套模型需要额外写校验注解吗？</summary>
+    <p>不需要。字段类型是 <code>list[OrderItem]</code> 时，每个元素都走 <code>OrderItem</code> 的校验规则，错误路径带上下标。</p></details>
+
+  <!-- ================= K3 ================= -->
+  <h2 id="k3"><span class="num">K3</span>列表推导与生成器</h2>
+  <p class="lead">对应 Java：Stream</p>
+
+  <div class="card">
+    <div class="core">一句话：方括号一次算完，圆括号用到才算。</div>
+    <ol>
+      <li><code>[f(x) for x in xs if cond]</code> 等价 <code>stream().filter().map().collect()</code>。</li>
+      <li><code>{k: v for ...}</code> 生成字典，<code>{x for ...}</code> 生成集合。</li>
+      <li>生成器 <code>(f(x) for x in xs)</code> 是惰性的，<b>不占内存</b>，一次只产出一个。</li>
+      <li>生成器<b>只能遍历一次</b>，遍历完就空了，也没有 <code>len()</code> 和下标。</li>
+      <li><code>yield</code> 用来写生成器函数，等价返回 <code>Iterator</code>。</li>
+      <li><code>itertools.groupby</code> 要求输入<b>已排序</b>，否则同组会被拆散。</li>
+    </ol>
+<pre><code>nums = [1, -2, 3, -4]
+print([x * 2 for x in nums if x &gt; 0])   # [2, 6]
+
+def read_lines(path: str):
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            yield line.strip()
+
+gen = (x * 2 for x in nums)
+print(list(gen))   # [2, -4, 6, -8]
+print(list(gen))   # []  第二次就空了</code></pre>
+    <div class="warn">需要长度、需要多次遍历、需要随机访问 → 用列表。数据大于内存、只需要顺序处理一次 → 用生成器。</div>
+    <p class="mnemonic"><b>口诀：</b>列表是「一次性做好一桌菜」，生成器是「吃一口上一口」。</p>
+    <label class="mastered"><input type="checkbox" data-k="k3"> 已掌握</label>
+  </div>
+
+  <details class="qa"><summary>自测：生成器表达式和列表推导，内存差在哪？</summary>
+    <p>列表推导立刻把所有结果放进内存；生成器只保存当前状态，处理 100 万行时内存几乎恒定。</p></details>
+
+  <!-- ================= K4 ================= -->
+  <h2 id="k4"><span class="num">K4</span>async / await 与事件循环</h2>
+  <p class="lead">对应 Java：CompletableFuture</p>
+
+  <div class="card">
+    <div class="core">一句话：async 是「一个服务员同时接十桌」，不是「请十个服务员」。</div>
+    <ol>
+      <li><code>async def</code> 定义协程函数，调用它得到协程对象，不会立即执行。</li>
+      <li><code>await</code> 把控制权交还事件循环，等 IO 完成再回来。</li>
+      <li>单线程 + 事件循环 + 协作式调度，<b>不是多线程</b>。</li>
+      <li><b>只加速 IO 密集</b>；CPU 密集不会变快，因为没有并行计算。</li>
+      <li><code>asyncio.gather</code> 并发等待多个协程，等价 <code>CompletableFuture.allOf</code>。</li>
+      <li>同步函数里不能 <code>await</code>；阻塞调用（<code>time.sleep</code>、<code>requests</code>、大循环）会卡死整个事件循环。</li>
+    </ol>
+    <table>
+      <tr><th>Java 线程池</th><th>Python asyncio</th></tr>
+      <tr><td>多线程，OS 调度</td><td>单线程，用户态调度</td></tr>
+      <tr><td>切换微秒级</td><td>切换纳秒级</td></tr>
+      <tr><td>CPU + IO 都能并行</td><td>只有 IO 能并发</td></tr>
+      <tr><td><code>allOf</code></td><td><code>gather</code></td></tr>
+    </table>
+<pre><code>async def work(i: int) -&gt; int:
+    await asyncio.sleep(1)
+    return i * i
+
+results = await asyncio.gather(*(work(i) for i in range(10)))
+# 10 个耗时约 1 秒，不是 10 秒</code></pre>
+    <p class="mnemonic"><b>口诀：</b>await 是排队等外卖，等的时候可以去洗菜；但厨师只有一个。</p>
+    <label class="mastered"><input type="checkbox" data-k="k4"> 已掌握</label>
+  </div>
+
+  <details class="qa"><summary>自测：CPU 密集任务怎么处理？</summary>
+    <p>用 <code>ProcessPoolExecutor</code> 或多进程，绕开 GIL；或者把计算交给其他服务。async 解决不了。</p></details>
+
+  <!-- ================= K5 ================= -->
+  <h2 id="k5"><span class="num">K5</span>异步 HTTP 与并发控制</h2>
+  <p class="lead">对应 Java：HttpClient + Semaphore</p>
+
+  <div class="card">
+    <div class="core">一句话：限流、超时、复用，一个都不能少。</div>
+    <ol>
+      <li>异步请求用 <code>httpx.AsyncClient</code>；<code>requests</code> 是同步的，会阻塞事件循环。</li>
+      <li>一个 <code>AsyncClient</code> 复用连接池，不要每次请求都新建。</li>
+      <li><code>asyncio.Semaphore(n)</code> 限制同时在飞的请求数，对应 Java <code>Semaphore</code>。</li>
+      <li>超时必须显式设置，否则一个慢请求拖垮整批。</li>
+      <li>重试要配合<b>幂等</b>：只有 GET / PUT 这类可以安全重试，POST 要小心重复下单。</li>
+      <li>遇到 429 要退避（指数 + 随机抖动），不要硬怼。</li>
+    </ol>
+<pre><code>sem = asyncio.Semaphore(5)
+async with httpx.AsyncClient(timeout=5.0) as client:
+    async def one() -&gt; int:
+        async with sem:
+            r = await client.get("http://127.0.0.1:8000/health")
+            return r.status_code
+    codes = await asyncio.gather(*(one() for _ in range(20)))</code></pre>
+    <p class="mnemonic"><b>口诀：</b>Semaphore 管人数，timeout 管耐心，Client 复用管成本。</p>
+    <label class="mastered"><input type="checkbox" data-k="k5"> 已掌握</label>
+  </div>
+
+  <details class="qa"><summary>自测：为什么 POST 重试可能出问题？</summary>
+    <p>POST 通常不幂等。第一次请求其实成功了但响应丢了，重试会再创建一次，导致重复订单。解决：幂等键（idempotency key）。</p></details>
+
+  <!-- ================= K6 ================= -->
+  <h2 id="k6"><span class="num">K6</span>工程习惯</h2>
+  <p class="lead">对应 Java：Maven + JUnit + Checkstyle</p>
+
+  <div class="card">
+    <div class="core">一句话：依赖用 uv，测试用 pytest，格式用 ruff。</div>
+    <ol>
+      <li><code>uv sync</code> 按 <code>pyproject.toml</code> + <code>uv.lock</code> 装依赖，等价 <code>mvn install</code>。</li>
+      <li><code>uv run ruff check .</code> 静态检查，<code>ruff format .</code> 格式化。</li>
+      <li><code>pytest</code> 用 <code>test_*.py</code> 命名发现用例，函数名也以 <code>test_</code> 开头。</li>
+      <li>路由分文件（<code>routers/</code>），模型抽到 <code>schemas.py</code>，不要在多个文件重复定义。</li>
+      <li>配置走环境变量 + <code>pydantic-settings</code>，<code>.env</code> 不进 git。</li>
+    </ol>
+<pre><code>uv sync
+uv run pytest -q
+uv run python -m uvicorn week01.app.main:app --reload
+ruff check . &amp;&amp; ruff format .</code></pre>
+    <p class="mnemonic"><b>口诀：</b>能自动检查的，绝不用眼睛看。</p>
+    <label class="mastered"><input type="checkbox" data-k="k6"> 已掌握</label>
+  </div>
+
+  <details class="qa"><summary>自测：为什么模型要抽到 schemas.py？</summary>
+    <p>同一份数据结构被多处使用时，重复定义会导致改一处漏一处。抽出来单一来源，也方便测试。</p></details>
+
+  <!-- ================= 必背 ================= -->
+  <h2 id="must"><span class="num">★</span>必背 20 条</h2>
+  <div class="card">
+    <ol>
+      <li>注解不校验，pydantic 才校验。</li>
+      <li>校验失败返回 422，字段路径在 <code>detail[].loc</code>。</li>
+      <li>GET 参数用 <code>Query()</code>，POST body 用 <code>BaseModel</code>。</li>
+      <li>长文本、敏感数据、有副作用 → 用 POST。</li>
+      <li><code>response_model</code> 决定输出结构和文档。</li>
+      <li>嵌套模型自动递归校验，不用额外注解。</li>
+      <li>金额用 <code>Decimal</code>，不用 <code>float</code>。</li>
+      <li>派生字段服务端算，用 <code>@computed_field</code>。</li>
+      <li><code>gt/ge/lt/le</code> = 大于/大于等于/小于/小于等于。</li>
+      <li>列表推导 = filter + map + collect。</li>
+      <li>生成器惰性、省内存、只能遍历一次。</li>
+      <li>需要长度和多次遍历就用列表。</li>
+      <li>async 是单线程事件循环，不是多线程。</li>
+      <li>async 只加速 IO，不加速 CPU。</li>
+      <li>阻塞调用会卡死整个事件循环。</li>
+      <li>并发必加 <code>Semaphore</code> 限流。</li>
+      <li>HTTP 请求必须设超时。</li>
+      <li>一个 <code>AsyncClient</code> 复用连接池。</li>
+      <li>POST 重试要配幂等键。</li>
+      <li>依赖 uv、测试 pytest、格式 ruff。</li>
+    </ol>
+  </div>
+
+  <!-- ================= 抽背 ================= -->
+  <h2 id="quiz"><span class="num">?</span>抽背 24 题</h2>
+  <p class="lead">先自己答，再展开对照。连续两次答对再勾「已掌握」。</p>
+
+  <details class="qa"><summary>1. Python 的类型注解运行时会检查吗？</summary><p>不会。只是元数据，pydantic 才会校验。</p></details>
+  <details class="qa"><summary>2. 校验失败返回什么状态码？错误在哪？</summary><p>422，错误列表在 <code>detail</code>，字段路径在 <code>loc</code>。</p></details>
+  <details class="qa"><summary>3. GET 和 POST 怎么选？</summary><p>无副作用的查询用 GET；有副作用、长文本、敏感数据用 POST。</p></details>
+  <details class="qa"><summary>4. <code>response_model</code> 有什么作用？</summary><p>过滤字段、生成文档、决定序列化结构。</p></details>
+  <details class="qa"><summary>5. 嵌套模型需要写 <code>@Valid</code> 之类的注解吗？</summary><p>不需要，类型是 BaseModel 就自动递归校验。</p></details>
+  <details class="qa"><summary>6. <code>@NotBlank</code> 对应 pydantic 的什么？</summary><p><code>Field(min_length=1)</code> 加 <code>@field_validator</code> 去空格，单靠前者拦不住纯空格。</p></details>
+  <details class="qa"><summary>7. <code>gt=0</code> 和 <code>ge=0</code> 的区别？</summary><p>gt 大于 0，ge 大于等于 0。金额用 gt，数量用 ge。</p></details>
+  <details class="qa"><summary>8. 为什么金额用 Decimal？</summary><p>float 是二进制浮点，0.1+0.2≠0.3，累计会有分位误差。</p></details>
+  <details class="qa"><summary>9. total 为什么不让客户端传？</summary><p>客户端可伪造。金额必须服务端根据明细计算。</p></details>
+  <details class="qa"><summary>10. 列表推导等价于 Java 的什么？</summary><p><code>stream().filter().map().collect()</code>。</p></details>
+  <details class="qa"><summary>11. 生成器能遍历几次？</summary><p>一次。遍历完就空了，也没有 len() 和下标。</p></details>
+  <details class="qa"><summary>12. 什么时候必须用生成器？</summary><p>数据大于内存、只需顺序处理一次、流式读取。</p></details>
+  <details class="qa"><summary>13. <code>itertools.groupby</code> 有什么前提？</summary><p>输入必须先排序，否则同组会被拆成多段。</p></details>
+  <details class="qa"><summary>14. async 是多线程吗？</summary><p>不是。单线程 + 事件循环 + 协作式调度。</p></details>
+  <details class="qa"><summary>15. async 能加速 CPU 密集任务吗？</summary><p>不能。需要多进程或换方案。</p></details>
+  <details class="qa"><summary>16. await 到底做了什么？</summary><p>把控制权交还事件循环，等 IO 完成后再恢复执行。</p></details>
+  <details class="qa"><summary>17. <code>asyncio.gather</code> 对应 Java 的什么？</summary><p><code>CompletableFuture.allOf</code>。</p></details>
+  <details class="qa"><summary>18. 在 async 函数里用 requests 会怎样？</summary><p>阻塞整个事件循环，所有协程一起卡住。要用 httpx.AsyncClient。</p></details>
+  <details class="qa"><summary>19. Semaphore 解决什么问题？</summary><p>限制同时进行的请求数，防止打爆对方或耗尽连接池。</p></details>
+  <details class="qa"><summary>20. 为什么不每次请求都新建 Client？</summary><p>连接池无法复用，握手开销大，性能和资源都浪费。</p></details>
+  <details class="qa"><summary>21. 为什么 POST 重试要小心？</summary><p>POST 通常不幂等，可能重复创建。要用幂等键。</p></details>
+  <details class="qa"><summary>22. 一个请求进来依次经过哪几步？</summary><p>路由匹配 → 参数校验 → 业务处理 → 响应序列化。</p></details>
+  <details class="qa"><summary>23. APIRouter 对应 Spring 的什么？</summary><p><code>@RestController</code> 分模块。</p></details>
+  <details class="qa"><summary>24. uv / pytest / ruff 分别对应 Java 的什么？</summary><p>Maven / JUnit / Checkstyle。</p></details>
+
+  <a class="back" href="index.html">← 回打卡手册</a>
+</main>
+
+<footer>W1 知识点手册 · 6 个知识块 · 20 条必背 · 24 道抽背</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // 主题
+  var themeBtn = document.getElementById("themeBtn");
+  var savedTheme = localStorage.getItem("w1-theme");
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  function syncIcon() {
+    themeBtn.textContent = document.documentElement.dataset.theme === "dark" ? "☀️" : "🌙";
+  }
+  syncIcon();
+  themeBtn.addEventListener("click", function () {
+    var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("w1-theme", next);
+    syncIcon();
+  });
+
+  // 掌握度
+  var KEY = "w1-knowledge-v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type="checkbox"][data-k]'));
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+
+  boxes.forEach(function (box) {
+    box.checked = !!state[box.dataset.k];
+    box.addEventListener("change", function () {
+      state[box.dataset.k] = box.checked;
+      localStorage.setItem(KEY, JSON.stringify(state));
+      render();
+    });
+  });
+
+  function render() {
+    var total = boxes.length;
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById("bar").style.width = pct + "%";
+    document.getElementById("progressText").textContent = done + " / " + total + " 已掌握";
+    document.getElementById("pctText").textContent = pct + "%";
+    boxes.forEach(function (b) {
+      var link = document.querySelector('#jump a[href="#' + b.dataset.k + '"]');
+      if (link) link.classList.toggle("done", b.checked);
+    });
+  }
+  render();
+
+  // 展开全部
+  var expanded = false;
+  var expandBtn = document.getElementById("expandBtn");
+  expandBtn.addEventListener("click", function () {
+    expanded = !expanded;
+    document.querySelectorAll("details.qa").forEach(function (d) { d.open = expanded; });
+    expandBtn.textContent = expanded ? "收起全部答案" : "展开全部答案";
+  });
+
+  // 打印时展开
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details.qa").forEach(function (d) { d.open = true; });
+  });
+})();
+</script>
+</body>
+</html>
