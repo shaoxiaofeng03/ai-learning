@@ -69,6 +69,13 @@
   .task:last-child { border-bottom:0; }
   .task input { width:20px; height:20px; margin:2px 0 0; accent-color:var(--accent); flex:0 0 auto; }
   .task.done span { text-decoration:line-through; color:var(--muted); }
+  details.lesson { background:var(--card); border:1px solid var(--border); border-radius:12px;
+                   padding:0 16px 14px; margin:12px 0; }
+  details.lesson summary { cursor:pointer; font-weight:600; font-size:14.5px;
+                           padding:14px 0 6px; color:var(--accent); }
+  details.lesson h4 { font-size:14px; margin:14px 0 4px; }
+  details.lesson p, details.lesson li { font-size:14.2px; }
+  details.lesson pre { margin-top:6px; }
   details.qa { background:var(--card); border:1px solid var(--border); border-radius:10px;
                padding:10px 14px; margin:8px 0; }
   details.qa summary { cursor:pointer; font-weight:600; font-size:14.3px; }
@@ -121,6 +128,39 @@
   <h2>D1 · 读懂第一个服务</h2>
   <p class="goal">目标：看懂 FastAPI 的最小结构，能自己加接口。</p>
 
+  <details class="lesson">
+    <summary>详细讲解 · 约 10 分钟读完</summary>
+
+    <h4>一个请求进来发生了什么</h4>
+<pre><code>浏览器
+  │ GET /echo?text=hi  或  POST /echo {"text":"hi"}
+  ▼
+路由匹配      @app.get / @app.post
+  ▼
+参数校验      Query() / BaseModel ──失败──▶ 422
+  ▼
+处理函数      你的业务代码
+  ▼
+响应序列化    response_model
+  ▼
+JSON 返回</code></pre>
+
+    <h4>装饰器什么时候注册路由</h4>
+    <p>模块被 import 的那一刻，<code>@app.get</code> 就执行了，函数被登记进路由表。不是每次请求才注册。所以拆分 <code>APIRouter</code> 时，只要 <code>include_router</code> 被执行过，路由就生效。</p>
+
+    <h4>GET 还是 POST</h4>
+    <table>
+      <tr><th></th><th>GET</th><th>POST</th></tr>
+      <tr><td>参数位置</td><td>URL 查询串</td><td>请求体</td></tr>
+      <tr><td>浏览器直接打开</td><td>能</td><td>不能</td></tr>
+      <tr><td>长度限制</td><td>有</td><td>基本没有</td></tr>
+      <tr><td>适用</td><td>无副作用查询</td><td>写操作、长文本、敏感数据</td></tr>
+    </table>
+
+    <h4>为什么 /docs 会白屏</h4>
+    <p>默认 Swagger UI 的 JS 从 <code>cdn.jsdelivr.net</code> 加载，国内打不开。已改成 bootcdn。</p>
+  </details>
+
   <div class="card">
     <h3>四个要点</h3>
     <ol>
@@ -165,6 +205,33 @@
 <section class="panel" id="d2">
   <h2>D2 · 类型系统与校验</h2>
   <p class="goal">目标：把 Java 的 DTO + Bean Validation 搬到 pydantic。</p>
+
+  <details class="lesson">
+    <summary>详细讲解 · 约 12 分钟读完</summary>
+
+    <h4>校验的执行顺序：before 和 after</h4>
+    <p>pydantic v2 的 <code>@field_validator</code> 默认是 <code>mode="after"</code>：先跑字段约束，再跑你的函数。</p>
+<pre><code>username = "   "
+  → min_length=3 通过（长度确实是 3）
+  → validator 执行 strip → ""
+  → 返回空字符串，没有任何人再检查</code></pre>
+    <p>所以要“先清洗、再约束”，用 <code>mode="before"</code>。</p>
+    <table>
+      <tr><th>mode</th><th>顺序</th><th>适合</th></tr>
+      <tr><td><code>before</code></td><td>你的函数 → 字段约束</td><td>strip、类型转换、规范化</td></tr>
+      <tr><td><code>after</code></td><td>字段约束 → 你的函数</td><td>跨字段、业务规则</td></tr>
+    </table>
+
+    <h4>422 的结构</h4>
+<pre><code>{"detail":[{"type":"greater_than_equal","loc":["body","age"],
+           "msg":"Input should be greater than or equal to 1","input":0}]}</code></pre>
+
+    <h4>模型层和 HTTP 层不一样</h4>
+    <p>直接 <code>User(...)</code> 时 <code>loc</code> 是 <code>("age",)</code>；经过 FastAPI 才变成 <code>["body","age"]</code>。写测试时要分清自己在测哪一层。</p>
+
+    <h4>计算字段的代价</h4>
+    <p><code>@computed_field + @property</code> 每次访问都重算；换成 <code>@cached_property</code> 只算一次，但模型可变时缓存会过期。</p>
+  </details>
 
   <div class="card">
     <h3>六个要点</h3>
@@ -246,6 +313,76 @@ class Order(BaseModel):
 <section class="panel" id="d3">
   <h2>D3 · 列表推导与生成器</h2>
   <p class="goal">目标：把 Java Stream 的思维翻译成 Python。</p>
+
+  <details class="lesson">
+    <summary>详细讲解 · 约 20 分钟读完</summary>
+
+    <h4>一、推导式有四种</h4>
+    <table>
+      <tr><th>写法</th><th>返回</th><th>用在哪</th></tr>
+      <tr><td><code>[f(x) for x in xs]</code></td><td>list</td><td>要长度、下标、多次遍历</td></tr>
+      <tr><td><code>{k: v for x in xs}</code></td><td>dict</td><td>建索引、聚合</td></tr>
+      <tr><td><code>{f(x) for x in xs}</code></td><td>set</td><td>去重</td></tr>
+      <tr><td><code>(f(x) for x in xs)</code></td><td>生成器</td><td>大数据、流式处理</td></tr>
+    </table>
+    <p>推导式有独立作用域：<code>x = 100</code> 之后再写 <code>[x*x for x in range(5)]</code>，外面的 <code>x</code> 仍然是 100。</p>
+
+    <h4>二、Iterable / Iterator / Generator</h4>
+    <table>
+      <tr><th>概念</th><th>特征</th><th>能遍历几次</th></tr>
+      <tr><td>Iterable</td><td>有 <code>__iter__</code>，如 list、dict、文件</td><td>多次</td></tr>
+      <tr><td>Iterator</td><td>有 <code>__next__</code>，如 <code>iter(list)</code></td><td>一次</td></tr>
+      <tr><td>Generator</td><td>一种 Iterator，<code>yield</code> 或圆括号推导式</td><td>一次</td></tr>
+    </table>
+<pre><code>nums = [1, 2, 3]   # Iterable，不是 Iterator
+it = iter(nums)    # Iterator
+next(it)           # 1
+next(it)           # 2
+next(it)           # 3
+next(it)           # StopIteration</code></pre>
+
+    <h4>三、yield 是暂停，不是返回</h4>
+<pre><code>def gen():
+    print("start")
+    yield 1
+    print("middle")
+    yield 2
+    print("end")
+
+g = gen()        # 什么都不打印，函数体没执行
+next(g)          # start → 1
+next(g)          # middle → 2
+next(g)          # end → StopIteration</code></pre>
+    <p><b>调用生成器函数不会执行函数体。</b>第一次 <code>next()</code> 才开始跑，遇到 <code>yield</code> 暂停并返回值，下次从暂停处继续。这就是它省内存的原因——同一时刻只有一个值在内存里。</p>
+
+    <h4>四、惰性验证</h4>
+<pre><code>def noisy(x):
+    print("compute", x)
+    return x * 2
+
+g = (noisy(x) for x in range(3))
+# 此刻没有任何输出
+list(g)
+# compute 0 / 1 / 2</code></pre>
+
+    <h4>五、今日练习：iter_batches</h4>
+    <table>
+      <tr><th>调用</th><th>期望</th></tr>
+      <tr><td><code>iter_batches([1,2,3,4,5], 2)</code></td><td><code>[[1,2],[3,4],[5]]</code></td></tr>
+      <tr><td><code>iter_batches([1,2,3,4], 2)</code></td><td><code>[[1,2],[3,4]]</code></td></tr>
+      <tr><td><code>iter_batches([], 2)</code></td><td><code>[]</code></td></tr>
+      <tr><td><code>iter_batches([1,2,3], 0)</code></td><td>抛 <code>ValueError</code></td></tr>
+    </table>
+    <p>边界三个：空列表、正好整除、最后不满一批。全过才算对。</p>
+
+    <h4>六、内存对比</h4>
+<pre><code>import tracemalloc
+tracemalloc.start()
+# ... 读文件并统计 ...
+current, peak = tracemalloc.get_traced_memory()
+print(f"peak = {peak / 1024 / 1024:.2f} MB")</code></pre>
+    <p>分别跑 <code>readlines()</code> 和 <code>for line in open(...)</code>，记下两个峰值。</p>
+  </details>
 
   <div class="card">
     <h3>五个要点</h3>
@@ -524,10 +661,14 @@ ruff format .                            # 格式化</code></pre>
   </div>
 
   <div class="card">
-    <h3>文档在哪</h3>
-<pre><code>ai-learning/docs/index.html   ← 整个页面就这一个文件
-ai-learning/week01/PLAN.md    ← 计划源头</code></pre>
-    <p class="muted" style="margin:8px 0 0">页面内容是从 PLAN.md 整理出来的。改了 PLAN，跟我说一声「同步到页面」。</p>
+    <h3>两份文档的分工</h3>
+    <table>
+      <tr><th>文件</th><th>组织方式</th><th>用途</th></tr>
+      <tr><td><code>docs/index.html</code></td><td>按天 D1-D6</td><td>每天跟学、打卡、看详细讲解</td></tr>
+      <tr><td><code>docs/knowledge.html</code></td><td>按主题 K1-K6</td><td>周末复盘、抽背、考前速览</td></tr>
+      <tr><td><code>week01/PLAN.md</code></td><td>按周</td><td>计划源头</td></tr>
+    </table>
+    <p class="muted" style="margin:8px 0 0">改了 PLAN，跟我说一声「同步到页面」。</p>
   </div>
 
   <div class="card">
